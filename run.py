@@ -1,13 +1,44 @@
+# requirements are markdown,flask and python
 from flask import Flask
-
+import markdown
 app = Flask(__name__)
+
+
+
+def authenticator(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not current_user.is_authenticated:
+            return redirect(url_for('login'))
+        return f(*args, **kwargs)
+    return decorated_function
+
 
 @app.route("/")
 def renderer():
     return render_template("preview.html")
-@app.route("/commit",methods=["POST"])
+
+@app.route('/commit', methods=['POST'])
 def commit():
+    changes = request.form.get('changes')
+    commit_message = request.form.get("message")
+
+    try:
+        repo = git.Repo(REPO_PATH)
+        repo.index.add('*') #commit message
+        repo.index.commit(commit_message
+            )
+        repo.remotes.origin.push()
+        return "Changes committed and pushed successfully."
+    except Exception as e:
+        return f"An error occurred: {str(e)}"
+
+@app.route('/login')
+def login():
+    # github auth
     pass
+
+
 
 def render_markdown(file_name, is_remote_file=True):
     """Try to fetch the file name from Github and if that fails, try to

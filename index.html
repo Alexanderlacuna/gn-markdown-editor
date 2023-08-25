@@ -205,7 +205,7 @@
                     <a class="nav-link" href="#"><i class="fas fa-download"></i> Download</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#"><i class="fas fa-save"></i> Commit</a>
+                            <a class="nav-link" href="#" data-toggle="modal"  data-target="#exampleModal" data-whatever="@mdo"><i class="fas fa-save"></i> Commit</a>
                 </li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="settingsDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -220,8 +220,37 @@
             </ul>
         </div>
     </nav>
-    <div id="container" style="top: 64px;">
-        <div id="edit" class="column" style="height: 592px;">
+
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Commit Changes</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="form-group">
+            <label for="recipient-name" class="col-form-label">content change:</label>
+            <input type="text" class="form-control" id="recipient-name">
+          </div>
+          <div class="form-group">
+            <label for="message-text" class="col-form-label">Commit Message:</label>
+            <textarea class="form-control" id="message-text"></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary">Commit</button>
+      </div>
+    </div>
+  </div>
+</div>
+    <div id="container" style="top: 55px;">
+        <div id="edit" class="column" style="height: 100vh;">
             <div id="editor-wrapper">
                 <div id="editor">
                 </div>

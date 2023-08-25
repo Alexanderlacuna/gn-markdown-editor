@@ -24,7 +24,6 @@
    return new_marked
 }
 
-
 function updatePreview(){
    previewContent = document.querySelector("#output");
   var markdownContent = editor.getValue();

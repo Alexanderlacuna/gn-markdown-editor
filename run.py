@@ -1,10 +1,11 @@
 # requirements are markdown,flask and python
-from flask import Flask
-import markdown
+from flask import Flask, request, render_template,redirect,url_for
+from github import Github
 app = Flask(__name__)
 
 
 def authenticator(f):
+    # modify for token here
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if not current_user.is_authenticated:
@@ -13,16 +14,14 @@ def authenticator(f):
     return decorated_function
 
 
-@app.route("/")
-def renderer():
-    return render_template("preview.html")
 
-
-@app.route("/edit_file", methods=["POST"])
+@app.route("/", methods=["GET","POST"])
 def edit_file_content():
-    repo_name = request.get("repo_name")
-    file_path = request.get("file_path")
-    access_token = "fetch access token"
+    #repo_name = request.get("repo_name")
+    #file_path = request.get("file_path")
+    repo_name = "data-vault-2"
+    file_path = "README.md"
+    access_token = "my token"
     # handle exception for this
     g = Github(access_token)
     user = g.get_user()
@@ -30,7 +29,8 @@ def edit_file_content():
     try:
         file_content = repo.get_contents(
             file_path).decoded_content.decode('utf-8')
-        return render_template("index_html", data=file_content)
+
+        return render_template("preview.html",data=file_content)
     except Exception as e:
         # add error page
         return f"Error fetching file: {str(e)}"

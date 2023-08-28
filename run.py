@@ -1,8 +1,13 @@
 # requirements are markdown,flask and python
 from flask import Flask, request, render_template,redirect,url_for
 from github import Github
+from github import InputGitTreeElement
 app = Flask(__name__)
 
+def gn_auth_access():
+    # the idea for this is to try to authenticate using gn 
+    #auth if success give users gn access token to  commit
+    pass 
 
 def authenticator(f):
     # modify for token here
@@ -14,14 +19,12 @@ def authenticator(f):
     return decorated_function
 
 
-
 @app.route("/", methods=["GET","POST"])
 def edit_file_content():
     #repo_name = request.get("repo_name")
     #file_path = request.get("file_path")
     repo_name = "data-vault-2"
     file_path = "README.md"
-    access_token = "my token"
     # handle exception for this
     g = Github(access_token)
     user = g.get_user()
@@ -42,35 +45,33 @@ def commit():
     access_token = "fetch access tokeb"
 
     if request.method == 'POST':
-        repo_name = request.form.get('repo_name')
-        file_path = request.form.get('file_path')
-        commit_message = request.form.get('commit_message')
-        content = request.form.get('content')
-
-        # isolate this
+#        repo_name = request.form.get('repo_name')
+#        file_path = request.form.get('file_path')
+        repo_name = "data-vault-2"
+        file_path = "README.md"
+        # handle exception for this
         g = Github(access_token)
         user = g.get_user()
         repo = user.get_repo(repo_name)
-        # modify this  for users selections
-
+        results = request.json
         master_ref = repo.get_git_ref('heads/master')
         master_sha = master_ref.object.sha
         master_tree = repo.get_git_tree(master_sha)
+        # fix this below
         blob = repo.create_git_blob(content, 'utf-8')
-        new_tree = repo.create_git_tree([
-            {
-                'path': file_path,
-                'mode': '100644',
-                'type': 'blob',
-                'sha': blob.sha,
-            }
-        ], base_tree=master_tree)
+        # blob.sha try content
+        tree_elements = [
+            InputGitTreeElement(file_path,"100644", "blob",results["new_changes"])
+        ]
+        new_tree = repo.create_git_tree(tree_elements, base_tree=master_tree)
+        commit = repo.create_git_commit(commit_message, new_tree, [repo.get_git_commit(master_sha)])
+        master_ref.edit(commit.sha)
         new_commit = repo.create_git_commit(
-            commit_message,
+            results["msg"],
             new_tree,
             [master_sha]
         )
-        master_ref.edit(new_commit.sha)
+        breakpoint()
         return render_template("success.html", text="Successfully made changes")
 
 

@@ -38,19 +38,40 @@ def edit_file_content():
 
 @app.route('/commit', methods=['POST'])
 def commit():
-    changes = request.form.get('changes')
-    commit_message = request.form.get("message")
 
-    try:
-        repo = git.Repo(REPO_PATH)
-        print(dir(repo.tree))
-        repo.index.add('*')  # commit message
-        repo.index.commit(commit_message
-                          )
-        repo.remotes.origin.push()
-        return "Changes committed and pushed successfully."
-    except Exception as e:
-        return f"An error occurred: {str(e)}"
+    access_token = "fetch access tokeb"
+
+    if request.method == 'POST':
+        repo_name = request.form.get('repo_name')
+        file_path = request.form.get('file_path')
+        commit_message = request.form.get('commit_message')
+        content = request.form.get('content')
+
+        # isolate this
+        g = Github(access_token)
+        user = g.get_user()
+        repo = user.get_repo(repo_name)
+        # modify this  for users selections
+
+        master_ref = repo.get_git_ref('heads/master')
+        master_sha = master_ref.object.sha
+        master_tree = repo.get_git_tree(master_sha)
+        blob = repo.create_git_blob(content, 'utf-8')
+        new_tree = repo.create_git_tree([
+            {
+                'path': file_path,
+                'mode': '100644',
+                'type': 'blob',
+                'sha': blob.sha,
+            }
+        ], base_tree=master_tree)
+        new_commit = repo.create_git_commit(
+            commit_message,
+            new_tree,
+            [master_sha]
+        )
+        master_ref.edit(new_commit.sha)
+        return render_template("success.html", text="Successfully made changes")
 
 
 @app.route('/login')

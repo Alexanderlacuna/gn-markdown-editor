@@ -25,6 +25,7 @@ def edit_file_content():
     #file_path = request.get("file_path")
     repo_name = "data-vault-2"
     file_path = "README.md"
+
     # handle exception for this
     g = Github(access_token)
     user = g.get_user()
@@ -42,7 +43,6 @@ def edit_file_content():
 @app.route('/commit', methods=['POST'])
 def commit():
 
-    access_token = "fetch access tokeb"
 
     if request.method == 'POST':
 #        repo_name = request.form.get('repo_name')
@@ -58,19 +58,15 @@ def commit():
         master_sha = master_ref.object.sha
         master_tree = repo.get_git_tree(master_sha)
         # fix this below
-        blob = repo.create_git_blob(content, 'utf-8')
+        blob = repo.create_git_blob(results["new_changes"], 'utf-8')
         # blob.sha try content
         tree_elements = [
             InputGitTreeElement(file_path,"100644", "blob",results["new_changes"])
         ]
         new_tree = repo.create_git_tree(tree_elements, base_tree=master_tree)
-        commit = repo.create_git_commit(commit_message, new_tree, [repo.get_git_commit(master_sha)])
+        commit = repo.create_git_commit(results["msg"], new_tree, [repo.get_git_commit(master_sha)])
         master_ref.edit(commit.sha)
-        new_commit = repo.create_git_commit(
-            results["msg"],
-            new_tree,
-            [master_sha]
-        )
+    
         breakpoint()
         return render_template("success.html", text="Successfully made changes")
 

@@ -4,7 +4,6 @@ import markdown
 app = Flask(__name__)
 
 
-
 def authenticator(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -18,6 +17,25 @@ def authenticator(f):
 def renderer():
     return render_template("preview.html")
 
+
+@app.route("/edit_file", methods=["POST"])
+def edit_file_content():
+    repo_name = request.get("repo_name")
+    file_path = request.get("file_path")
+    access_token = "fetch access token"
+    # handle exception for this
+    g = Github(access_token)
+    user = g.get_user()
+    repo = user.get_repo(repo_name)
+    try:
+        file_content = repo.get_contents(
+            file_path).decoded_content.decode('utf-8')
+        return render_template("index_html", data=file_content)
+    except Exception as e:
+        # add error page
+        return f"Error fetching file: {str(e)}"
+
+
 @app.route('/commit', methods=['POST'])
 def commit():
     changes = request.form.get('changes')
@@ -25,19 +43,20 @@ def commit():
 
     try:
         repo = git.Repo(REPO_PATH)
-        repo.index.add('*') #commit message
+        print(dir(repo.tree))
+        repo.index.add('*')  # commit message
         repo.index.commit(commit_message
-            )
+                          )
         repo.remotes.origin.push()
         return "Changes committed and pushed successfully."
     except Exception as e:
         return f"An error occurred: {str(e)}"
 
+
 @app.route('/login')
 def login():
     # github auth
     pass
-
 
 
 def render_markdown(file_name, is_remote_file=True):
@@ -65,12 +84,14 @@ look for it inside the file system """
             "[https://github.com/genenetwork/gn-docs]. "
             "Please reach out to the gn2 team to have a look at this")
 
+
 def get_file_from_python_search_path(pathname_suffix):
     cands = [os.path.join(d, pathname_suffix) for d in sys.path]
     try:
         return list(filter(os.path.exists, cands))[0]
     except IndexError:
         return None
+
 
 def get_blogs(user: str = "genenetwork",
               repo_name: str = "gn-docs") -> dict:
@@ -105,5 +126,6 @@ def get_blogs(user: str = "genenetwork",
 
     return dict(sorted(blogs.items(), key=lambda x: x[0], reverse=True))
 
+
 if __name__ == "__main__":
-	app.run(port=5000,debug=True)
+    app.run(port=5000, debug=True)

@@ -4,13 +4,10 @@ from github import Github
 from github import InputGitTreeElement
 app = Flask(__name__)
 
-def gn_auth_access():
-    # the idea for this is to try to authenticate using gn 
-    #auth if success give users gn access token to  commit
-    pass 
+
 
 def authenticator(f):
-    # modify for token here
+    # modify for token h
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if not current_user.is_authenticated:
@@ -19,13 +16,31 @@ def authenticator(f):
     return decorated_function
 
 
+def gn_auth_access():
+    # the idea for this is to try to authenticate using gn 
+    #auth if success give users gn access token to  commit
+    # check for gn authentication then get access token to repo
+    pass 
+
+def fetch_repo_name_from_url(url: str) -> str:
+    # add this for git url
+    last_slash_index = url.rfind("/")
+    last_suffix_index = url.rfind(".git")
+    if last_suffix_index < 0:
+        last_suffix_index = len(url)
+
+    if last_slash_index < 0 or last_suffix_index <= last_slash_index:
+        raise Exception("Badly formatted url {}".format(url))
+
+    return url[last_slash_index + 1:last_suffix_index]
+
+
 @app.route("/", methods=["GET","POST"])
 def edit_file_content():
     #repo_name = request.get("repo_name")
     #file_path = request.get("file_path")
     repo_name = "data-vault-2"
     file_path = "README.md"
-
     # handle exception for this
     g = Github(access_token)
     user = g.get_user()
@@ -40,15 +55,17 @@ def edit_file_content():
         return f"Error fetching file: {str(e)}"
 
 
+
 @app.route('/commit', methods=['POST'])
 def commit():
+
 
 
     if request.method == 'POST':
 #        repo_name = request.form.get('repo_name')
 #        file_path = request.form.get('file_path')
         repo_name = "data-vault-2"
-        file_path = "README.md"
+        file_path = "README2.md"
         # handle exception for this
         g = Github(access_token)
         user = g.get_user()

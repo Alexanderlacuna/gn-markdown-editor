@@ -1,5 +1,5 @@
 # requirements are markdown,flask and python
-from flask import Flask, request, render_template, redirect, url_for
+from flask import Flask, request, render_template, redirect, url_for,jsonify
 from github import Github
 from urllib.parse import urlparse
 from github import InputGitTreeElement
@@ -71,11 +71,9 @@ def commit():
 
     '''
     route to commit changes for  an existing file or new file
-
     '''
-
     if request.method == 'POST':
-        parsed_data = request.json["git_url"]
+        parsed_data = parse_github_url(request.json["git_url"])
         repo_name = parsed_data.get("repository_name")
         file_path = parsed_data.get("file_path")
         g = Github(access_token)
@@ -95,7 +93,19 @@ def commit():
         commit = repo.create_git_commit(results["msg"], new_tree, [
                                         repo.get_git_commit(master_sha)])
         master_ref.edit(commit.sha)
-        return render_template("success.html", text="Successfully made changes")
+        return jsonify({"commit":commit.sha , "commit_message":results["msg"]})
+
+
+
+@app.route('/parser')
+def marked_down_parser():
+    ''' this route uses python-markdown to parse markdown to html
+     ::expensive  to call for live preview
+    '''
+    try:
+        return markdown.markdown(request.json()["text"],extensions=["tables"])
+    except Exception as e:
+        return f"error while parsing markdown  {str(e)}"
 
 if __name__ == "__main__":
     app.run(port=5000, debug=True)

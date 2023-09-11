@@ -203,7 +203,7 @@ img {
 
 
       <li class="nav-item">
-        <a class="nav-link" href="/?refresh_token={{refresh_link}}">
+        <a class="nav-link" href="/?refresh_link={{refresh_link}}">
                    <i class="fa fa-undo" aria-hidden="true"></i>
          Refresh</a>
       </li>
@@ -526,6 +526,7 @@ document.querySelector("#commit-form").addEventListener("submit",async  (event)=
   event.preventDefault();
   let msg = document.querySelector("#message-text").value;
   let data = postJSON("commit" ,{
+    git_url:"{{ refresh_link }}",
     msg:msg,
     new_changes: editor.getValue()  //.replace(/^\s*[\r\n]/gm, '')  //check if content has changed
   });

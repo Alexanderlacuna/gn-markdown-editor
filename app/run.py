@@ -58,15 +58,15 @@ def git_diff(repo, branch, file_path, commit):
 def edit_file_content(g):
     edit_file = request.args.get("refresh_link")
     if not edit_file:
-        edit_file = "https://github.com/Alexanderlacuna/data-vault-2/blob/master/README.md"
+        edit_file = request.json["git_url"]
     parsed_data = parse_github_url(edit_file)
     repo = g.get_user().get_repo(parsed_data.get("repository_name"))
     try:
         file_content = repo.get_contents(
             parsed_data.get("file_path")).decoded_content.decode('utf-8')
         return render_template("preview.html", data=file_content, refresh_link=edit_file)
-    except Exception as e:
-        return f"Error fetching file: {str(e)}"
+    except Exception as error:
+        return f"Error fetching file: {str(error)}"
 
 
 @app.route('/commit', methods=['POST'])
@@ -75,7 +75,6 @@ def commit(g):
     '''
     route to commit changes for  an existing file or new file
     '''
-    request.json["git_url"] = "https://github.com/Alexanderlacuna/data-vault-2/blob/master/README.md"
     if request.method == 'POST':
         parsed_data = parse_github_url(request.json["git_url"])
         repo = g.get_user().get_repo(parsed_data.get("repository_name"))
@@ -83,9 +82,8 @@ def commit(g):
         master_ref = repo.get_git_ref('heads/master')
         master_sha = master_ref.object.sha
         master_tree = repo.get_git_tree(master_sha)
-        # fix this below
-        try:
 
+        try:
             blob = repo.create_git_blob(results["new_changes"], 'utf-8')
             tree_elements = [
                 InputGitTreeElement(parsed_data.get("file_path"), "100644", "blob",
@@ -99,7 +97,6 @@ def commit(g):
             return jsonify({"commit": commit.sha, "commit_message": results["msg"]})
         except Exception as error:
             return jsonify({"error": str(error)})
-
 
 @app.route('/parser', methods=['POST'])
 def marked_down_parser():

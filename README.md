@@ -24,7 +24,7 @@ python -m main
 
 
 
-### example on how to edit a page as a server 
+### example on how to edit a markdown page
 
 *NB:edit the config file to provide to your github access token*
 
@@ -41,6 +41,20 @@ http://127.0.0.1:5000/?refresh_link=https://github.com/Alexanderlacuna/data-vaul
 
 ## License
 see License File
+
+
+
+## Acknowledgments
+
+This project relies on several  libraries and tools. We would like to express our gratitude to the following  projects:
+
+
+- [Ac ](https://github.com/ajaxorg/ace) - Ace is a standalone code editor written in JavaScript
+
+- [markedjs](https://marked.js.org/) - A markdown parser and compiler. Built for speed.
+
+
+
 
 
 

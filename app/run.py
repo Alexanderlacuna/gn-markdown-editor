@@ -4,9 +4,10 @@ from flask import Flask, request, render_template, redirect, url_for,jsonify
 from github import Github
 from urllib.parse import urlparse
 from github import InputGitTreeElement
-app = Flask(__name__)
+from app import app
 
 
+#app.config.from_object('config.DefaultConfig')
 def authenticator(f):
     # modify for token h
     @wraps(f)
@@ -76,6 +77,8 @@ def commit():
     '''
     route to commit changes for  an existing file or new file
     '''
+    
+    request.json["git_url"] = "https://github.com/Alexanderlacuna/data-vault-2/blob/master/README.md"
     if request.method == 'POST':
         parsed_data = parse_github_url(request.json["git_url"])
         repo_name = parsed_data.get("repository_name")
@@ -112,6 +115,3 @@ def marked_down_parser():
     except Exception as e:
         raise e
         return f"error while parsing markdown  {str(e)}"
-
-if __name__ == "__main__":
-    app.run(port=5000, debug=True)

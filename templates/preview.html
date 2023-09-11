@@ -231,11 +231,11 @@ img {
   <h5>Select or Enter a Theme:</h5>
   <form id="themeOptionsForm">
     <div class="form-check">
-      <input class="form-check-input" type="radio" name="theme" id="normalTheme" value="textmate" >
+      <input class="form-check-input" type="radio" name="theme" id="normalTheme" value="textmate" checked >
       <label class="form-check-label" for="normalTheme">Text</label>
     </div>
     <div class="form-check">
-      <input class="form-check-input" type="radio" name="theme" id="monokaiTheme" value="monokai" checked>
+      <input class="form-check-input" type="radio" name="theme" id="monokaiTheme" value="monokai" >
       <label class="form-check-label" for="monokaiTheme">Monokai</label>
     </div>
     <div class="form-check">
@@ -434,9 +434,6 @@ var editor_configurations = {
 
 
 editor.setOptions(editor_configurations);
-
-console.log(editor.container)  
-
 editor.container.style.resize = "horizontal";
 
 
@@ -497,10 +494,7 @@ const updateFilenameDisplay =()=>{
    previewContent = document.querySelector("#output");
     var markdownContent = editor.getValue();
   var htmlContent = new_marked.parse(markdownContent)
-
-  console.log(htmlContent)
   previewContent.innerHTML = htmlContent;
-
   
   }
 editor.getSession().on('change', function(e) {
@@ -543,7 +537,6 @@ let  {commit,commit_message} =  await data;
   $("#commit-message-sha").text(commit_message);
   }
 else{
-  console.log("calling this inner")
   $("#commit-status").text("Your commit failed")
   $("#commit-message-sha").text("Your request failed")
   $("#success-class").addClass("bg-danger")
@@ -565,7 +558,6 @@ $('#settingBtn').click(function () {
   };
 
 
-console.log(formData)
 
   editor.setOptions({
   ...editor_configurations,
@@ -573,7 +565,6 @@ console.log(formData)
 });
 
   editor.renderer.updateFull();
-console.log(editor_configurations)
 
 });
 

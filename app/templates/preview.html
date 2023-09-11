@@ -409,8 +409,8 @@ var editor_configurations = {
   maxPixelHeight: 0, // number -> maxLines: set the maximum height in pixel, when 'maxLines' is defined. 
   scrollPastEnd: 0, // number -> !maxLines: if positive, user can scroll pass the last line and go n * editorHeight more distance 
   fixedWidthGutter: false, // boolean: true if the gutter should be fixed width
-  theme: "ace/theme/monokai", // theme string from ace/theme or custom?
- 
+  theme: "ace/theme/textmode", // theme string from ace/theme or custom?
+
   // mouseHandler options
   scrollSpeed: 2, // number: the scroll speed index
   dragDelay: 0, // number: the drag delay before drag starts. it's 150ms for mac by default 
@@ -425,7 +425,7 @@ var editor_configurations = {
   useWorker: true, // boolean: true if use web worker for loading scripts
   useSoftTabs: true, // boolean: true if we want to use spaces than tabs
   tabSize: 4, // number
-  wrap: false, // boolean | string | number: true/'free' means wrap instead of horizontal scroll, false/'off' means horizontal scroll instead of wrap, and number means number of column before wrap. -1 means wrap at print margin
+  wrap: true, // boolean | string | number: true/'free' means wrap instead of horizontal scroll, false/'off' means horizontal scroll instead of wrap, and number means number of column before wrap. -1 means wrap at print margin
   indentedSoftWrap: true, // boolean
   foldStyle: 'markbegin', // enum: 'manual'/'markbegin'/'markbeginend'.
   mode: 'ace/mode/markdown' // string: path to language mode 

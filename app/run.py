@@ -13,13 +13,14 @@ from github import Github, GithubException
 def authenticator(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
+
         github_token = get_github_access_token()
         if not github_token:
             return "Unauthorized: GitHub token not provided", 401
         try:
             g = Github(github_token)
             user = g.get_user()
-            if user:
+            if user.name:
                 return f(g, *args, **kwargs)
         except GithubException as e:
             return f"GitHub authentication failed: {str(e)}", 401
@@ -29,7 +30,7 @@ def authenticator(f):
 
 def get_github_access_token():
     # override this method to get the token from  elsewhere
-    pass
+    return app.config["GITHUB_ACCESS_TOKEN"]
 
 
 def parse_github_url(url):
@@ -57,31 +58,26 @@ def git_diff(repo, branch, file_path, commit):
 
 
 @app.route("/", methods=["GET", "POST"])
-def edit_file_content():
+@authenticator
+def edit_file_content(g):
     edit_file = request.args.get("refresh_link")
     if not edit_file:
         edit_file = "https://github.com/Alexanderlacuna/data-vault-2/blob/master/README.md"
-
     parsed_data = parse_github_url(edit_file)
     repo_name = parsed_data.get("repository_name")
     file_path = parsed_data.get("file_path")
-
-    # handle exception for this
-    g = Github(access_token)  # auth for token
-    user = g.get_user()
-    repo = user.get_repo(repo_name)
+    repo = g.get_user().get_repo(repo_name)
     try:
         file_content = repo.get_contents(
             file_path).decoded_content.decode('utf-8')
-
         return render_template("preview.html", data=file_content, refresh_link=edit_file)
     except Exception as e:
-        # add error page
         return f"Error fetching file: {str(e)}"
 
 
 @app.route('/commit', methods=['POST'])
-def commit():
+@authenticator
+def commit(g):
     '''
     route to commit changes for  an existing file or new file
     '''
@@ -90,9 +86,7 @@ def commit():
         parsed_data = parse_github_url(request.json["git_url"])
         repo_name = parsed_data.get("repository_name")
         file_path = parsed_data.get("file_path")
-        g = Github(access_token)
-        user = g.get_user()
-        repo = user.get_repo(repo_name)
+        repo = g.get_user().get_repo(repo_name)
         results = request.json
         master_ref = repo.get_git_ref('heads/master')
         master_sha = master_ref.object.sha
@@ -116,7 +110,6 @@ def marked_down_parser():
      ::expensive  to call for live preview
     '''
     try:
-
         results = markdown.markdown(
             request.json["text"], extensions=["tables"])
         return jsonify({"data": results})

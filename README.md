@@ -25,3 +25,11 @@ python -m run.py
 
 ## License
 see License File
+
+
+
+## TODOS
+
+[] add full resize functionality for browser and render page
+
+[] full editor customization like color scheme,key bindings 

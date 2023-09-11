@@ -3,30 +3,19 @@
 Gn-markdown-editor  is a tiny web tool to preview Markdown formatted text.
 
 
-
-##  Running only the UI
-for quick setup without server processing run
-
-python -m http.server
-
-
-
-
-
-## Run local testing server
+## To run the server
 
 use guix;etc to load the requirements(python,flask and markdown)
+
+*NB:edit the config file to provide to your github access token*
+
 
 ```
 python -m main
 
 ```
 
-
-
 ### example on how to edit a markdown page
-
-*NB:edit the config file to provide to your github access token*
 
 
 ```
@@ -53,13 +42,11 @@ This project relies on several  libraries and tools. We would like to express ou
 
 
 
-
 ## TODOS
 
 [] add full resize functionality for browser and render page
 
 [] full editor customization like color scheme,key bindings 
-
 
 
 

@@ -225,7 +225,7 @@ img {
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-        <form id="commit-form">
+        <form id="settings-form">
       <div class="modal-body">
 <div class="modal-body">
   <h5>Select or Enter a Theme:</h5>
@@ -280,13 +280,6 @@ img {
       </div>
         <form id="commit-form">
       <div class="modal-body">
-            <!--
-          <div class="form-group">
-            <label for="recipient-name" class="col-form-label">content change:</label>
-            <input type="text" class="form-control" id="recipient-name">
-          </div>
-
-        -->
           <div class="form-group">
             <label for="message-text" class="col-form-label">Commit Message:</label>
             <textarea class="form-control" id="message-text"></textarea>
@@ -300,6 +293,38 @@ img {
     </div>
   </div>
 </div>
+
+
+<!-- add code to show the message after a request -->
+
+<div class="modal fade" id="successModal" tabindex="-1" role="dialog" aria-labelledby="successModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="successModalLabel">Success</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body bg-success">
+
+        <p>Your commit was successful!</p>
+        <div class=" text-white">
+          <p ><Strong>Commit Sha</Strong>: <span id="commit-sha"></span></p>
+          <p ><Strong>Message</Strong>:<span id="commit-message-sha"></span></p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!--ends here -->
+
+
  
     <div id="container" style="top: 55px;">
       <div id="edit" class="column" style="height: 100vh;">
@@ -476,19 +501,34 @@ async function postJSON(api,data) {
     });
 
     const result = await response.json();
-    return "success"
+    return result
   } catch (error) {
     console.error("Error:", error);
   }
 }
 
-document.querySelector("#commit-form").addEventListener("submit",(event)=>{  
+document.querySelector("#commit-form").addEventListener("submit",async  (event)=>{  
   event.preventDefault();
   let msg = document.querySelector("#message-text").value;
   let data = postJSON("commit" ,{
     msg:msg,
     new_changes: editor.getValue()  //.replace(/^\s*[\r\n]/gm, '')  //check if content has changed
   });
+
+
+$("#exampleModal").modal("hide")
+//  console.log($("#exampleModal"))
+
+  const {commit,commit_message} =  await data;
+  $("#commit-sha").text(commit);
+  $("#commit-message-sha").text(commit_message);
+  const testx = "success"
+  if (testx=="success"){
+    console.log("$successModal")
+     $('#successModal').modal('show');
+
+  }
+
 })
 
 
@@ -503,7 +543,8 @@ $('#settingBtn').click(function () {
   theme: $('input[name="theme"]:checked').val(),
     fontSize: $('#fontSizeRange').val()
   };
-  console.log(formData)
+
+  //update the editor values 
 });
 
 

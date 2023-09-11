@@ -2,6 +2,9 @@
 
 
 
+ 
+
+
  function  configureMarkdownParser() { 
  	//add code highlighting functionality
    const {markedHighlight} = globalThis.markedHighlight;
@@ -23,6 +26,7 @@
 
    return new_marked
 }
+
 
 function updatePreview(){
    previewContent = document.querySelector("#output");

@@ -1,4 +1,5 @@
 # requirements are markdown,flask and python
+import markdown
 from flask import Flask, request, render_template, redirect, url_for,jsonify
 from github import Github
 from urllib.parse import urlparse
@@ -48,6 +49,9 @@ def git_diff(repo,branch,file_path,commit):
 
 @app.route("/", methods=["GET","POST"])
 def edit_file_content():
+    edit_file = request.args.get("refresh_link")        
+    if not edit_file:
+        edit_file = "https://github.com/Alexanderlacuna/data-vault-2/blob/master/README.md"
 
     parsed_data = parse_github_url(edit_file)
     repo_name = parsed_data.get("repository_name")
@@ -61,7 +65,7 @@ def edit_file_content():
         file_content = repo.get_contents(
             file_path).decoded_content.decode('utf-8')
 
-        return render_template("preview.html", data=file_content)
+        return render_template("preview.html", data=file_content,refresh_link=edit_file)
     except Exception as e:
         # add error page
         return f"Error fetching file: {str(e)}"
@@ -96,15 +100,17 @@ def commit():
         return jsonify({"commit":commit.sha , "commit_message":results["msg"]})
 
 
-
-@app.route('/parser')
+@app.route('/parser',methods =['POST'])
 def marked_down_parser():
     ''' this route uses python-markdown to parse markdown to html
      ::expensive  to call for live preview
     '''
     try:
-        return markdown.markdown(request.json()["text"],extensions=["tables"])
+
+        results = markdown.markdown(request.json["text"],extensions=["tables"])
+        return jsonify({"data":results})
     except Exception as e:
+        raise e
         return f"error while parsing markdown  {str(e)}"
 
 if __name__ == "__main__":

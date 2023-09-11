@@ -160,7 +160,6 @@ img {
 
 #edit {
   height: 100vh;
- background: red;
 }
 
 
@@ -181,10 +180,11 @@ img {
     <meta http-equiv="content-style-type" content="text/css">
     <meta name="description" content="This is the online markdown editor with live preview.">
 
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
 
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+   
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/default.min.css">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.7/css/all.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
@@ -203,7 +203,7 @@ img {
 
 
       <li class="nav-item">
-        <a class="nav-link" href="#">
+        <a class="nav-link" href="/?refresh_token={{refresh_link}}">
                    <i class="fa fa-undo" aria-hidden="true"></i>
          Refresh</a>
       </li>
@@ -236,10 +236,13 @@ img {
       </div>
         <form id="commit-form">
       <div class="modal-body">
+            <!--
           <div class="form-group">
             <label for="recipient-name" class="col-form-label">content change:</label>
             <input type="text" class="form-control" id="recipient-name">
           </div>
+
+        -->
           <div class="form-group">
             <label for="message-text" class="col-form-label">Commit Message:</label>
             <textarea class="form-control" id="message-text"></textarea>
@@ -272,6 +275,8 @@ img {
     </div>
 
     <footer id="footer" style=""></footer>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="//ajaxorg.github.io/ace-builds/src-min-noconflict/ace.js"></script>
     <script src="https://kit.fontawesome.com/a076d05399.js"></script>
       <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
@@ -414,18 +419,19 @@ editor.getSession().on('change', function(e) {
 
     });
 
-async function postJSON(data) {
+
+async function postJSON(api,data) {
   try {
-    const response = await fetch("http://127.0.0.1:5000/commit", {
+    const response = await fetch(`/${api}`, {
       method: "POST", // or 'PUT'
       headers: {
         "Content-Type": "application/json",
       },
+      //prettify code markdownInput.replace(/^\s*[\r\n]/gm, '')
       body: JSON.stringify(data),
     });
 
     const result = await response.json();
-    console.log("Success:", result);
     return "success"
   } catch (error) {
     console.error("Error:", error);
@@ -435,9 +441,9 @@ async function postJSON(data) {
 document.querySelector("#commit-form").addEventListener("submit",(event)=>{  
   event.preventDefault();
   let msg = document.querySelector("#message-text").value;
-  let data = postJSON({
+  let data = postJSON("commit" ,{
     msg:msg,
-    new_changes: editor.getValue()  //check if content has changed
+    new_changes: editor.getValue()  //.replace(/^\s*[\r\n]/gm, '')  //check if content has changed
   });
 })
 

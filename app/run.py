@@ -1,27 +1,34 @@
 # requirements are markdown,flask and python
 import markdown
-from flask import Flask, request, render_template, redirect, url_for,jsonify
+from flask import Flask, request, render_template, redirect, url_for, jsonify
 from github import Github
 from urllib.parse import urlparse
 from github import InputGitTreeElement
 from app import app
 
+from functools import wraps
+from github import Github, GithubException
 
-#app.config.from_object('config.DefaultConfig')
+
 def authenticator(f):
-    # modify for token h
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if not current_user.is_authenticated:
-            return redirect(url_for('login'))
-        return f(*args, **kwargs)
+        github_token = get_github_access_token()
+        if not github_token:
+            return "Unauthorized: GitHub token not provided", 401
+        try:
+            g = Github(github_token)
+            user = g.get_user()
+            if user:
+                return f(g, *args, **kwargs)
+        except GithubException as e:
+            return f"GitHub authentication failed: {str(e)}", 401
+        return "Unauthorized: GitHub authentication failed", 401
     return decorated_function
 
 
-def gn_auth_access():
-    # the idea for this is to try to authenticate using gn
-    # auth if success give users gn access token to  commit
-    # check for gn authentication then get access token to repo
+def get_github_access_token():
+    # override this method to get the token from  elsewhere
     pass
 
 
@@ -42,15 +49,16 @@ def parse_github_url(url):
     }
 
 
-def git_diff(repo,branch,file_path,commit):
+def git_diff(repo, branch, file_path, commit):
     last_head = repo.get_branch(branch)
     diff_url = repo.compare(last_head.commit.sha,
                             commit.sha)
     return diff_url.diff_url
 
-@app.route("/", methods=["GET","POST"])
+
+@app.route("/", methods=["GET", "POST"])
 def edit_file_content():
-    edit_file = request.args.get("refresh_link")        
+    edit_file = request.args.get("refresh_link")
     if not edit_file:
         edit_file = "https://github.com/Alexanderlacuna/data-vault-2/blob/master/README.md"
 
@@ -66,18 +74,17 @@ def edit_file_content():
         file_content = repo.get_contents(
             file_path).decoded_content.decode('utf-8')
 
-        return render_template("preview.html", data=file_content,refresh_link=edit_file)
+        return render_template("preview.html", data=file_content, refresh_link=edit_file)
     except Exception as e:
         # add error page
         return f"Error fetching file: {str(e)}"
 
+
 @app.route('/commit', methods=['POST'])
 def commit():
-
     '''
     route to commit changes for  an existing file or new file
     '''
-    
     request.json["git_url"] = "https://github.com/Alexanderlacuna/data-vault-2/blob/master/README.md"
     if request.method == 'POST':
         parsed_data = parse_github_url(request.json["git_url"])
@@ -100,18 +107,19 @@ def commit():
         commit = repo.create_git_commit(results["msg"], new_tree, [
                                         repo.get_git_commit(master_sha)])
         master_ref.edit(commit.sha)
-        return jsonify({"commit":commit.sha , "commit_message":results["msg"]})
+        return jsonify({"commit": commit.sha, "commit_message": results["msg"]})
 
 
-@app.route('/parser',methods =['POST'])
+@app.route('/parser', methods=['POST'])
 def marked_down_parser():
     ''' this route uses python-markdown to parse markdown to html
      ::expensive  to call for live preview
     '''
     try:
 
-        results = markdown.markdown(request.json["text"],extensions=["tables"])
-        return jsonify({"data":results})
+        results = markdown.markdown(
+            request.json["text"], extensions=["tables"])
+        return jsonify({"data": results})
     except Exception as e:
         raise e
         return f"error while parsing markdown  {str(e)}"

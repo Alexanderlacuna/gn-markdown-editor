@@ -18,7 +18,8 @@ python -m http.server
 use guix;etc to load the requirements(python,flask and markdown)
 
 ```
-python -m run.py
+python -m main
+
 ```
 
 

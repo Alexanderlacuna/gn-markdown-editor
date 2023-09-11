@@ -231,11 +231,11 @@ img {
   <h5>Select or Enter a Theme:</h5>
   <form id="themeOptionsForm">
     <div class="form-check">
-      <input class="form-check-input" type="radio" name="theme" id="normalTheme" value="normal" checked>
-      <label class="form-check-label" for="normalTheme">Normal</label>
+      <input class="form-check-input" type="radio" name="theme" id="normalTheme" value="textmate" >
+      <label class="form-check-label" for="normalTheme">Text</label>
     </div>
     <div class="form-check">
-      <input class="form-check-input" type="radio" name="theme" id="monokaiTheme" value="monokai">
+      <input class="form-check-input" type="radio" name="theme" id="monokaiTheme" value="monokai" checked>
       <label class="form-check-label" for="monokaiTheme">Monokai</label>
     </div>
     <div class="form-check">
@@ -358,7 +358,8 @@ var editor = ace.edit("editor");
 
 // Default value is the first one in comments
 // All options are set to default value
-editor.setOptions({
+
+var editor_configurations = {
   // editor options
   selectionStyle: 'line',// "line"|"text"
   highlightActiveLine: true, // boolean
@@ -412,7 +413,11 @@ editor.setOptions({
   indentedSoftWrap: true, // boolean
   foldStyle: 'markbegin', // enum: 'manual'/'markbegin'/'markbeginend'.
   mode: 'ace/mode/markdown' // string: path to language mode 
-});
+}
+
+
+
+editor.setOptions(editor_configurations);
 
 console.log(editor.container)  
 
@@ -538,9 +543,18 @@ $('#fontSizeRange').on('input', function () {
 });
 $('#settingBtn').click(function () {
   var formData = {
-  theme: $('input[name="theme"]:checked').val(),
-    fontSize: $('#fontSizeRange').val()
+    theme: `ace/theme/${$('input[name="theme"]:checked').val()}`,
+    fontSize: parseInt($("#fontSizeRange").val())
   };
+
+
+  editor.setOptions({
+  ...editor_configurations,
+  ...formData
+});
+
+  editor.renderer.updateFull();
+console.log(editor_configurations)
 
 });
 

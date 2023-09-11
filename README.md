@@ -38,9 +38,7 @@ http://127.0.0.1:5000/?refresh_link=https://github.com/Alexanderlacuna/data-vaul
 ```
 
 
-
-## License
-see License File
+![Demo](preview.png)
 
 
 
@@ -56,10 +54,15 @@ This project relies on several  libraries and tools. We would like to express ou
 
 
 
-
-
 ## TODOS
 
 [] add full resize functionality for browser and render page
 
 [] full editor customization like color scheme,key bindings 
+
+
+
+
+## License
+see License File
+

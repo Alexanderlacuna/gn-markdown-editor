@@ -60,6 +60,8 @@ This project relies on several  libraries and tools. We would like to express ou
 
 
 
+## Features
+* edit markdown,preview and commit changes to github repo
 
 ## TODOS
 
